@@ -15,5 +15,13 @@ get '/items/:id' do
 end
 
 post '/items' do
-  "create items"
+  'create items'
+end
+
+put '/items/:id' do
+  params[:id]
+end
+
+delete '/items/:id' do
+  params[:id]
 end
