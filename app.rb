@@ -3,6 +3,9 @@
 require 'sinatra/base'
 require 'sinatra/activerecord'
 
+class Note < ActiveRecord::Base
+end
+
 class App < Sinatra::Base
   register Sinatra::ActiveRecordExtension
   set :database, { adapter: 'sqlite3', database: "#{environment}.sqlite3" }
