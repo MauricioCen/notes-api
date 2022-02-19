@@ -2,6 +2,6 @@
 
 source 'https://rubygems.org'
 
-ruby '2.7.2'
+ruby '2.7.5'
 
 gem 'sinatra', '~> 2.2'
