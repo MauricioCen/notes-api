@@ -1,8 +1,12 @@
 # frozen_string_literal: true
 
 require 'sinatra/base'
+require 'sinatra/activerecord'
 
 class App < Sinatra::Base
+  register Sinatra::ActiveRecordExtension
+  set :database, { adapter: 'sqlite3', database: 'app.sqlite3' }
+
   get '/' do
     'Hello world!'
   end
