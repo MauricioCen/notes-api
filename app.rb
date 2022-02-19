@@ -5,7 +5,7 @@ require 'sinatra/activerecord'
 
 class App < Sinatra::Base
   register Sinatra::ActiveRecordExtension
-  set :database, { adapter: 'sqlite3', database: 'app.sqlite3' }
+  set :database, { adapter: 'sqlite3', database: "#{environment}.sqlite3" }
 
   get '/' do
     'Hello world!'
