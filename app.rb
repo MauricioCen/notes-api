@@ -2,6 +2,7 @@
 
 require 'sinatra/base'
 require 'sinatra/activerecord'
+require 'sinatra/contrib/all'
 
 class Note < ActiveRecord::Base
 end
@@ -14,12 +15,12 @@ class App < Sinatra::Base
     'Hello world!'
   end
 
-  get '/items' do
-    'Get all items'
+  get '/notes' do
+    json Note.all
   end
 
-  get '/items/:id' do
-    params[:id]
+  get '/notes/:id' do
+    json Note.find(params[:id])
   end
 
   post '/items' do
