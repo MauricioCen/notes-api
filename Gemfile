@@ -9,3 +9,5 @@ gem 'sinatra', '~> 2.2'
 gem 'sinatra-activerecord', '~> 2.0'
 gem 'sinatra-contrib', '~> 2.2'
 gem 'sqlite3', '~> 1.4'
+
+gem "rack-contrib", "~> 2.3"
