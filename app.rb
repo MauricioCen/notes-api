@@ -4,8 +4,14 @@ require 'sinatra/base'
 require 'sinatra/activerecord'
 require 'sinatra/contrib/all'
 require 'rack/contrib'
+require 'blueprinter'
 
 class Note < ActiveRecord::Base
+end
+
+class NoteSerializer < Blueprinter::Base
+  identifier :id
+  fields :name, :created_at
 end
 
 class App < Sinatra::Base
@@ -20,26 +26,27 @@ class App < Sinatra::Base
   end
 
   get '/notes' do
-    json Note.all
+    notes = Note.all
+    json NoteSerializer.render_as_hash(notes)
   end
 
   get '/notes/:id' do
     note = Note.find_by(id: params[:id])
     halt 404 if note.nil?
-    json note
+    json NoteSerializer.render_as_hash(note)
   end
 
   post '/notes' do
     note = Note.create!(params)
     status 201
-    json note
+    json NoteSerializer.render_as_hash(note)
   end
 
   put '/notes/:id' do
     note = Note.find_by(id: params[:id])
     halt 404 if note.nil?
     note.update!(params)
-    json note
+    json NoteSerializer.render_as_hash(note)
   end
 
   delete '/notes/:id' do
