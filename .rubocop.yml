@@ -1,0 +1,11 @@
+inherit_from: .rubocop_todo.yml
+
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 2.7
+  SuggestExtensions: false
+  Exclude:
+    - 'db/schema.rb'
+
+Style/Documentation:
+  Enabled: false
