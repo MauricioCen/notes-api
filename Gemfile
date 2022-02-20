@@ -4,6 +4,7 @@ source 'https://rubygems.org'
 
 ruby '2.7.5'
 
+gem 'blueprinter', '~> 0.25.3'
 gem 'rack-contrib', '~> 2.3'
 gem 'rake', '~> 13.0'
 gem 'sinatra', '~> 2.2'
