@@ -11,3 +11,7 @@ gem 'sinatra', '~> 2.2'
 gem 'sinatra-activerecord', '~> 2.0'
 gem 'sinatra-contrib', '~> 2.2'
 gem 'sqlite3', '~> 1.4'
+
+group :development, :test do
+  gem 'byebug', '~> 11.1'
+end

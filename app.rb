@@ -1,10 +1,7 @@
 # frozen_string_literal: true
 
-require 'sinatra/base'
-require 'sinatra/activerecord'
-require 'sinatra/contrib/all'
-require 'rack/contrib'
-require 'blueprinter'
+require 'bundler/setup'
+Bundler.require(:default, ENV['RACK_ENV'])
 
 class Note < ActiveRecord::Base
 end
