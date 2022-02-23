@@ -19,6 +19,12 @@ class UserSerializer < Blueprinter::Base
   fields :name, :last_name, :email, :created_at
 end
 
+class NoteContract < Dry::Validation::Contract
+  params do
+    required(:name).filled(:string)
+  end
+end
+
 class App < Sinatra::Base
   register Sinatra::ActiveRecordExtension
   set :database, { adapter: 'sqlite3', database: "#{environment}.sqlite3" }
@@ -42,6 +48,8 @@ class App < Sinatra::Base
   end
 
   post '/notes' do
+    contract = NoteContract.new.call(params)
+    halt 422, (json errors: contract.errors.to_h) if contract.failure?
     note = Note.create!(params)
     status 201
     json NoteSerializer.render_as_hash(note)
@@ -50,6 +58,8 @@ class App < Sinatra::Base
   put '/notes/:id' do
     note = Note.find_by(id: params[:id])
     halt 404 if note.nil?
+    contract = NoteContract.new.call(params)
+    halt 422, (json errors: contract.errors.to_h) if contract.failure?
     note.update!(params)
     json NoteSerializer.render_as_hash(note)
   end
