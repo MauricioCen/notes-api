@@ -25,6 +25,14 @@ class NoteContract < Dry::Validation::Contract
   end
 end
 
+class UserContract < Dry::Validation::Contract
+  params do
+    required(:name).filled(:string)
+    required(:last_name).filled(:string)
+    required(:email).filled(:string)
+  end
+end
+
 class App < Sinatra::Base
   register Sinatra::ActiveRecordExtension
   set :database, { adapter: 'sqlite3', database: "#{environment}.sqlite3" }
@@ -81,6 +89,8 @@ class App < Sinatra::Base
   end
 
   post '/users' do
+    contract = UserContract.new.call(params)
+    halt 422, (json errors: contract.errors.to_h) if contract.failure?
     user = User.create!(params)
     status 201
     json UserSerializer.render_as_hash(user)
@@ -89,6 +99,8 @@ class App < Sinatra::Base
   put '/users/:id' do
     user = User.find_by(id: params[:id])
     halt 404 if user.nil?
+    contract = UserContract.new.call(params)
+    halt 422, (json errors: contract.errors.to_h) if contract.failure?
     user.update!(params)
     json UserSerializer.render_as_hash(user)
   end
