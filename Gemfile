@@ -15,3 +15,5 @@ gem 'sqlite3', '~> 1.4'
 group :development, :test do
   gem 'byebug', '~> 11.1'
 end
+
+gem "dry-validation", "~> 1.8"
