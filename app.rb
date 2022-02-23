@@ -6,9 +6,17 @@ Bundler.require(:default, ENV['RACK_ENV'])
 class Note < ActiveRecord::Base
 end
 
+class User < ActiveRecord::Base
+end
+
 class NoteSerializer < Blueprinter::Base
   identifier :id
   fields :name, :created_at
+end
+
+class UserSerializer < Blueprinter::Base
+  identifier :id
+  fields :name, :last_name, :email, :created_at
 end
 
 class App < Sinatra::Base
@@ -48,6 +56,34 @@ class App < Sinatra::Base
 
   delete '/notes/:id' do
     Note.find_by(id: params[:id])&.destroy!
+    halt 204
+  end
+
+  get '/users' do
+    users = User.all
+    json UserSerializer.render_as_hash(users)
+  end
+
+  get '/users/:id' do
+    user = User.find_by(id: params[:id])
+    halt 404 if user.nil?
+    json UserSerializer.render_as_hash(user)
+  end
+
+  post '/users' do
+    user = User.create!(params)
+    status 201
+    json UserSerializer.render_as_hash(user)
+  end
+
+  put '/users/:id' do
+    user = User.find_by(id: params[:id])
+    halt 404 if user.nil?
+    user.update!(params)
+    json UserSerializer.render_as_hash(user)
+  end
+  delete '/users/:id' do
+    User.find_by(id: params[:id])&.destroy!
     halt 204
   end
 end
