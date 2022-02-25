@@ -12,6 +12,7 @@ Pagy::DEFAULT[:overflow] = :empty_page
 
 class Note < ActiveRecord::Base
   belongs_to :user
+  belongs_to :category
 end
 
 class User < ActiveRecord::Base
@@ -19,22 +20,24 @@ class User < ActiveRecord::Base
 end
 
 class Category < ActiveRecord::Base
+  has_many :notes
+end
+
+class CategorySerializer < Blueprinter::Base
+  identifier :id
+  fields :name, :created_at
 end
 
 class NoteSerializer < Blueprinter::Base
   identifier :id
   fields :name, :created_at
+  association :category, blueprint: CategorySerializer
 end
 
 class UserSerializer < Blueprinter::Base
   identifier :id
   fields :name, :last_name, :email, :created_at
   association :notes, blueprint: NoteSerializer
-end
-
-class CategorySerializer < Blueprinter::Base
-  identifier :id
-  fields :name, :created_at
 end
 
 class NoteContract < Dry::Validation::Contract
