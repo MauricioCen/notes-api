@@ -40,8 +40,6 @@ class UserSerializer < Blueprinter::Base
   association :notes, blueprint: NoteSerializer
 end
 
-
-
 class NoteContract < Dry::Validation::Contract
   params do
     required(:name).filled(:string)
