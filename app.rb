@@ -3,6 +3,13 @@
 require 'bundler/setup'
 Bundler.require(:default, ENV['RACK_ENV'])
 
+require 'pagy/extras/metadata'
+require 'pagy/extras/overflow'
+
+Pagy::DEFAULT[:items]    = 5
+Pagy::DEFAULT[:metadata] = %i[items count page pages]
+Pagy::DEFAULT[:overflow] = :empty_page
+
 class Note < ActiveRecord::Base
 end
 
@@ -48,6 +55,7 @@ class CategoryContract < Dry::Validation::Contract
 end
 
 class App < Sinatra::Base
+  include Pagy::Backend
   register Sinatra::ActiveRecordExtension
   set :database, { adapter: 'sqlite3', database: "#{environment}.sqlite3" }
   configure :development do
@@ -59,14 +67,14 @@ class App < Sinatra::Base
   end
 
   get '/notes' do
-    notes = Note.all
-    json NoteSerializer.render_as_hash(notes)
+    pagy, notes = pagy(Note.all, items: params[:size])
+    json NoteSerializer.render_as_hash(notes, meta: pagy_metadata(pagy), root: :notes)
   end
 
   get '/notes/:id' do
     note = Note.find_by(id: params[:id])
     halt 404 if note.nil?
-    json NoteSerializer.render_as_hash(note)
+    json NoteSerializer.render_as_hash(note, root: :note)
   end
 
   post '/notes' do
@@ -74,7 +82,7 @@ class App < Sinatra::Base
     halt 422, (json errors: contract.errors.to_h) if contract.failure?
     note = Note.create!(params)
     status 201
-    json NoteSerializer.render_as_hash(note)
+    json NoteSerializer.render_as_hash(note, root: :note)
   end
 
   put '/notes/:id' do
@@ -83,7 +91,7 @@ class App < Sinatra::Base
     contract = NoteContract.new.call(params)
     halt 422, (json errors: contract.errors.to_h) if contract.failure?
     note.update!(params)
-    json NoteSerializer.render_as_hash(note)
+    json NoteSerializer.render_as_hash(note, root: :note)
   end
 
   delete '/notes/:id' do
@@ -92,14 +100,14 @@ class App < Sinatra::Base
   end
 
   get '/users' do
-    users = User.all
-    json UserSerializer.render_as_hash(users)
+    pagy, users = pagy(User.all, items: params[:size])
+    json UserSerializer.render_as_hash(users, meta: pagy_metadata(pagy), root: :users)
   end
 
   get '/users/:id' do
     user = User.find_by(id: params[:id])
     halt 404 if user.nil?
-    json UserSerializer.render_as_hash(user)
+    json UserSerializer.render_as_hash(user, root: :user)
   end
 
   post '/users' do
@@ -107,7 +115,7 @@ class App < Sinatra::Base
     halt 422, (json errors: contract.errors.to_h) if contract.failure?
     user = User.create!(params)
     status 201
-    json UserSerializer.render_as_hash(user)
+    json UserSerializer.render_as_hash(user, root: :user)
   end
 
   put '/users/:id' do
@@ -116,7 +124,7 @@ class App < Sinatra::Base
     contract = UserContract.new.call(params)
     halt 422, (json errors: contract.errors.to_h) if contract.failure?
     user.update!(params)
-    json UserSerializer.render_as_hash(user)
+    json UserSerializer.render_as_hash(user, root: :user)
   end
 
   delete '/users/:id' do
@@ -125,14 +133,14 @@ class App < Sinatra::Base
   end
 
   get '/categories' do
-    categories = Category.all
-    json CategorySerializer.render_as_hash(categories)
+    pagy, categories = pagy(Category.all, items: params[:size])
+    json CategorySerializer.render_as_hash(categories, meta: pagy_metadata(pagy), root: :categories)
   end
 
   get '/categories/:id' do
     category = Category.find_by(id: params[:id])
     halt 404 if category.nil?
-    json CategorySerializer.render_as_hash(category)
+    json CategorySerializer.render_as_hash(category, root: :category)
   end
 
   post '/categories' do
@@ -140,7 +148,7 @@ class App < Sinatra::Base
     halt 422, (json errors: contract.errors.to_h) if contract.failure?
     category = Category.create!(params)
     status 201
-    json CategorySerializer.render_as_hash(category)
+    json CategorySerializer.render_as_hash(category, root: :category)
   end
 
   put '/categories/:id' do
@@ -149,7 +157,7 @@ class App < Sinatra::Base
     contract = CategoryContract.new.call(params)
     halt 422, (json errors: contract.errors.to_h) if contract.failure?
     category.update!(params)
-    json CategorySerializer.render_as_hash(category)
+    json CategorySerializer.render_as_hash(category, root: :category)
   end
 
   delete '/categories/:id' do
