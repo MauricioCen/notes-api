@@ -11,9 +11,11 @@ Pagy::DEFAULT[:metadata] = %i[items count page pages]
 Pagy::DEFAULT[:overflow] = :empty_page
 
 class Note < ActiveRecord::Base
+  belongs_to :user
 end
 
 class User < ActiveRecord::Base
+  has_many :notes
 end
 
 class Category < ActiveRecord::Base
@@ -27,6 +29,7 @@ end
 class UserSerializer < Blueprinter::Base
   identifier :id
   fields :name, :last_name, :email, :created_at
+  association :notes, blueprint: NoteSerializer
 end
 
 class CategorySerializer < Blueprinter::Base
