@@ -52,4 +52,18 @@ class AppTest < Minitest::Test
     response = JSON.parse(last_response.body)
     assert_equal(10, response['users'].length)
   end
+
+  def test_get_category
+    category = create(:category)
+    get "/categories/#{category.id}"
+    response = JSON.parse(last_response.body)
+    assert_equal(category.id, response['category']['id'])
+  end
+
+  def test_get_categories_with_pagination
+    create_list(:category, 20)
+    get '/categories', page: 1, size: 3
+    response = JSON.parse(last_response.body)
+    assert_equal(3, response['categories'].length)
+  end
 end
