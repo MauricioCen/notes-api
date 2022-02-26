@@ -62,8 +62,17 @@ end
 
 class App < Sinatra::Base
   include Pagy::Backend
+  logger = Logger.new($stdout)
+
   register Sinatra::ActiveRecordExtension
+
+  set :logger, logger
   set :database, { adapter: 'sqlite3', database: "#{environment}.sqlite3" }
+
+  configure :development, :production do 
+    ActiveRecord::Base.logger = logger
+  end
+
   configure :development do
     register Sinatra::Reloader
   end
