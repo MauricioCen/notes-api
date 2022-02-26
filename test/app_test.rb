@@ -38,4 +38,18 @@ class AppTest < Minitest::Test
     response = JSON.parse(last_response.body)
     assert_equal(10, response['notes'].length)
   end
+
+  def test_get_user
+    user = create(:user)
+    get "/users/#{user.id}"
+    response = JSON.parse(last_response.body)
+    assert_equal(user.id, response['user']['id'])
+  end
+
+  def test_get_users_with_pagination
+    create_list(:user, 20)
+    get '/users', page: 1, size: 10
+    response = JSON.parse(last_response.body)
+    assert_equal(10, response['users'].length)
+  end
 end
