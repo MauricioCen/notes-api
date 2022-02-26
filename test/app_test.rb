@@ -25,8 +25,17 @@ class AppTest < Minitest::Test
     DatabaseCleaner.clean
   end
 
-  def test_create_note
+  def test_get_note
     note = create(:note)
-    assert_equal(note.persisted?, true)
+    get "/notes/#{note.id}"
+    response = JSON.parse(last_response.body)
+    assert_equal(note.id, response['note']['id'])
+  end
+
+  def test_get_notes_with_pagination
+    create_list(:note, 20)
+    get '/notes', page: 1, size: 10
+    response = JSON.parse(last_response.body)
+    assert_equal(10, response['notes'].length)
   end
 end
