@@ -69,7 +69,7 @@ class App < Sinatra::Base
   set :logger, logger
   set :database, { adapter: 'sqlite3', database: "#{environment}.sqlite3" }
 
-  configure :development, :production do 
+  configure :development, :production do
     ActiveRecord::Base.logger = logger
   end
 
