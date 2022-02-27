@@ -32,11 +32,42 @@ class AppTest < Minitest::Test
     assert_equal(note.id, response['note']['id'])
   end
 
+  def test_get_note_with_fake_id
+    get '/notes/fake_id'
+    assert_equal(404, last_response.status)
+  end
+
   def test_get_notes_with_pagination
     create_list(:note, 20)
     get '/notes', page: 1, size: 10
     response = JSON.parse(last_response.body)
     assert_equal(10, response['notes'].length)
+  end
+
+  def test_create_note
+    payload = { name: FFaker::Lorem.word }
+    post '/notes', payload
+    response = JSON.parse(last_response.body)
+    assert_equal(payload[:name], response['note']['name'])
+  end
+
+  def test_try_create_note_without_name
+    post '/notes', name: ''
+    assert_equal(422, last_response.status)
+  end
+
+  def test_delete_note
+    note = create(:note)
+    delete "/notes/#{note.id}"
+    assert_equal(false, Note.exists?(note.id))
+  end
+
+  def test_update_note
+    note = create(:note)
+    new_name = FFaker::Lorem.word
+    put "/notes/#{note.id}", name: new_name
+    response = JSON.parse(last_response.body)
+    assert_equal(new_name, response['note']['name'])
   end
 
   def test_get_user
