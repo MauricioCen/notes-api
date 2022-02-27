@@ -95,7 +95,7 @@ class App < Sinatra::Base
   post '/notes' do
     contract = NoteContract.new.call(params)
     halt 422, (json errors: contract.errors.to_h) if contract.failure?
-    note = Note.create!(params)
+    note = Note.create!(contract.to_h)
     status 201
     json NoteSerializer.render_as_hash(note, root: :note)
   end
@@ -105,7 +105,7 @@ class App < Sinatra::Base
     halt 404 if note.nil?
     contract = NoteContract.new.call(params)
     halt 422, (json errors: contract.errors.to_h) if contract.failure?
-    note.update!(params)
+    note.update!(contract.to_h)
     json NoteSerializer.render_as_hash(note, root: :note)
   end
 
