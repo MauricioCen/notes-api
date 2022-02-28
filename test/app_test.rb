@@ -92,8 +92,10 @@ class AppTest < Minitest::Test
   def test_create_user
     payload = { name: FFaker::Name.first_name, last_name: FFaker::Name.last_name, email: FFaker::Internet.email }
     post '/users', payload
-    response = JSON.parse(last_response.body)
-    assert_equal(payload[:name], response['user']['name'])
+    response = JSON.parse(last_response.body)['user']
+    assert_equal(payload[:name], response['name'])
+    assert_equal(payload[:last_name], response['last_name'])
+    assert_equal(payload[:email], response['email'])
   end
 
   def test_try_create_user_without_name
