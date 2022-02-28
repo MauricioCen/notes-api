@@ -128,7 +128,7 @@ class App < Sinatra::Base
   post '/users' do
     contract = UserContract.new.call(params)
     halt 422, (json errors: contract.errors.to_h) if contract.failure?
-    user = User.create!(params)
+    user = User.create!(contract.to_h)
     status 201
     json UserSerializer.render_as_hash(user, root: :user)
   end
@@ -138,7 +138,7 @@ class App < Sinatra::Base
     halt 404 if user.nil?
     contract = UserContract.new.call(params)
     halt 422, (json errors: contract.errors.to_h) if contract.failure?
-    user.update!(params)
+    user.update!(contract.to_h)
     json UserSerializer.render_as_hash(user, root: :user)
   end
 

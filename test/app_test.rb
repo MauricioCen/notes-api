@@ -77,11 +77,48 @@ class AppTest < Minitest::Test
     assert_equal(user.id, response['user']['id'])
   end
 
+  def test_get_user_with_fake_id
+    get '/users/fake_id'
+    assert_equal(404, last_response.status)
+  end
+
   def test_get_users_with_pagination
     create_list(:user, 20)
     get '/users', page: 1, size: 10
     response = JSON.parse(last_response.body)
     assert_equal(10, response['users'].length)
+  end
+
+  def test_create_user
+    payload = { name: FFaker::Name.first_name, last_name: FFaker::Name.last_name, email: FFaker::Internet.email }
+    post '/users', payload
+    response = JSON.parse(last_response.body)['user']
+    assert_equal(payload[:name], response['name'])
+    assert_equal(payload[:last_name], response['last_name'])
+    assert_equal(payload[:email], response['email'])
+  end
+
+  def test_try_create_user_without_name
+    post '/users', name: ''
+    assert_equal(422, last_response.status)
+  end
+
+  def test_delete_user
+    user = create(:user)
+    delete "/users/#{user.id}"
+    assert_equal(false, User.exists?(user.id))
+  end
+
+  def test_update_user
+    user = create(:user)
+    new_name = FFaker::Name.first_name
+    last_name = FFaker::Name.last_name
+    email = FFaker::Internet.email
+    put "/users/#{user.id}", name: new_name, last_name: last_name, email: email
+    response = JSON.parse(last_response.body)['user']
+    assert_equal(new_name, response['name'])
+    assert_equal(last_name, response['last_name'])
+    assert_equal(email, response['email'])
   end
 
   def test_get_category
