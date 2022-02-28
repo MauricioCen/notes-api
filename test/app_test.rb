@@ -128,10 +128,41 @@ class AppTest < Minitest::Test
     assert_equal(category.id, response['category']['id'])
   end
 
+  def test_get_category_with_fake_id
+    get '/category/fake_id'
+    assert_equal(404, last_response.status)
+  end
+
   def test_get_categories_with_pagination
     create_list(:category, 20)
     get '/categories', page: 1, size: 3
     response = JSON.parse(last_response.body)
     assert_equal(3, response['categories'].length)
+  end
+
+  def test_create_category
+    payload = { name: FFaker::Lorem.word }
+    post '/categories', payload
+    response = JSON.parse(last_response.body)
+    assert_equal(payload[:name], response['category']['name'])
+  end
+
+  def test_try_create_category_without_name
+    post '/categories', name: ''
+    assert_equal(422, last_response.status)
+  end
+
+  def test_delete_category
+    category = create(:category)
+    delete "/categories/#{category.id}"
+    assert_equal(false, Category.exists?(category.id))
+  end
+
+  def test_update_category
+    category = create(:category)
+    new_name = FFaker::Lorem.word
+    put "/categories/#{category.id}", name: new_name
+    response = JSON.parse(last_response.body)
+    assert_equal(new_name, response['category']['name'])
   end
 end

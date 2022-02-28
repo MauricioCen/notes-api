@@ -161,7 +161,7 @@ class App < Sinatra::Base
   post '/categories' do
     contract = CategoryContract.new.call(params)
     halt 422, (json errors: contract.errors.to_h) if contract.failure?
-    category = Category.create!(params)
+    category = Category.create!(contract.to_h)
     status 201
     json CategorySerializer.render_as_hash(category, root: :category)
   end
@@ -171,7 +171,7 @@ class App < Sinatra::Base
     halt 404 if category.nil?
     contract = CategoryContract.new.call(params)
     halt 422, (json errors: contract.errors.to_h) if contract.failure?
-    category.update!(params)
+    category.update!(contract.to_h)
     json CategorySerializer.render_as_hash(category, root: :category)
   end
 
