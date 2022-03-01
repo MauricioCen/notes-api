@@ -165,4 +165,26 @@ class AppTest < Minitest::Test
     response = JSON.parse(last_response.body)
     assert_equal(new_name, response['category']['name'])
   end
+
+  def test_get_notes_by_user
+    user_one = create(:user)
+    create_list(:note, 3, user_id: user_one.id)
+    user_two = create(:user)
+    create_list(:note, 2, user_id: user_two.id)
+
+    get "/users/#{user_two.id}/notes"
+    response = JSON.parse(last_response.body)
+    assert_equal(2, response['notes'].length)
+  end
+
+  def test_get_notes_by_category
+    category_one = create(:category)
+    create_list(:note, 2, category_id: category_one.id)
+    categry_two = create(:category)
+    create_list(:note, 4, category_id: categry_two.id)
+
+    get "/categories/#{categry_two.id}/notes"
+    response = JSON.parse(last_response.body)
+    assert_equal(4, response['notes'].length)
+  end
 end

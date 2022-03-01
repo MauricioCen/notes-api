@@ -179,4 +179,14 @@ class App < Sinatra::Base
     Category.find_by(id: params[:id])&.destroy!
     halt 204
   end
+
+  get '/users/:user_id/notes' do
+    pagy, notes = pagy(Note.where(user_id: params[:user_id]), items: params[:size])
+    json NoteSerializer.render_as_hash(notes, meta: pagy_metadata(pagy), root: :notes)
+  end
+
+  get '/categories/:category_id/notes' do
+    pagy, notes = pagy(Note.where(category_id: params[:category_id]), items: params[:size])
+    json NoteSerializer.render_as_hash(notes, meta: pagy_metadata(pagy), root: :notes)
+  end
 end
